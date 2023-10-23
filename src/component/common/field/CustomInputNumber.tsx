@@ -14,8 +14,6 @@ interface Props {
   name?: string;
   value: number;
   disabled?: boolean;
-  reachMaximum?: boolean;
-  reachMinimum?: boolean;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   allowMinus?: boolean;
@@ -31,8 +29,6 @@ const CustomInputNumber: React.FC<Props> = ({
   onChange,
   onBlur,
   allowMinus = false,
-  reachMaximum,
-  reachMinimum,
 }) => {
   const [mouseStillIn, setMouseStillIn] = React.useState<boolean>(false);
 
@@ -57,8 +53,8 @@ const CustomInputNumber: React.FC<Props> = ({
     if (min > max) {
       throw new Error("min must be less than or equal to max");
     }
-    // Throw error if step > max - min
-    if (step > max - min) {
+    // Throw error if step > max - min, and max and min is not equal
+    if (step > max - min && max !== min) {
       throw new Error("step must be less than or equal to max - min");
     }
     // Throw error if step <= 0
@@ -216,7 +212,7 @@ const CustomInputNumber: React.FC<Props> = ({
         onClick={riser}
         onMouseDown={onPlusMouseDown}
         onMouseUp={onMouseUp}
-        disabled={disabled || value >= max || reachMaximum}
+        disabled={disabled || value >= max}
       >
         +
       </button>
@@ -240,7 +236,7 @@ const CustomInputNumber: React.FC<Props> = ({
         onClick={dropper}
         onMouseDown={onMinusMouseDown}
         onMouseUp={onMouseUp}
-        disabled={disabled || value <= min || reachMinimum}
+        disabled={disabled || value <= min}
       >
         -
       </button>

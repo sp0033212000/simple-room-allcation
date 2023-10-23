@@ -49,10 +49,6 @@ const RoomAllocation: React.FC<Props> = ({ guest, room, onChange }) => {
     );
   }, [serializedRoom]);
 
-  const isFull = useMemo(() => {
-    return totalAssignedGuest >= guest;
-  }, [totalAssignedGuest, guest]);
-
   const handleAdultChange = useCallback((id: string) => {
     return (adult: number) => {
       setSerializedRoom((prev) =>
@@ -96,7 +92,7 @@ const RoomAllocation: React.FC<Props> = ({ guest, room, onChange }) => {
             child={room.child}
             onAdultChange={handleAdultChange(room.id)}
             onChildChange={handleChildChange(room.id)}
-            reachMaximum={isFull}
+            leftGuest={guest - totalAssignedGuest}
           />
         ))}
       </div>
@@ -112,9 +108,9 @@ const SingleRoomAllocation = memo<{
   child: number;
   onAdultChange: (adult: number) => void;
   onChildChange: (child: number) => void;
-  reachMaximum: boolean;
+  leftGuest: number;
 }>(
-  ({ id, adult, child, onAdultChange, onChildChange, reachMaximum }) => {
+  ({ id, adult, child, onAdultChange, onChildChange, leftGuest }) => {
     const changeHandler = useCallback<
       (type: "adult" | "child") => ChangeEventHandler<HTMLInputElement>
     >(
@@ -151,8 +147,8 @@ const SingleRoomAllocation = memo<{
               name={`${id}-adult`}
               value={adult}
               min={1}
+              max={Math.max(leftGuest + adult, adult)}
               onChange={changeHandler("adult")}
-              reachMaximum={reachMaximum}
             />
           </div>
         </div>
@@ -162,8 +158,8 @@ const SingleRoomAllocation = memo<{
             <CustomInputNumber
               name={`${id}-child`}
               value={child}
+              max={Math.max(leftGuest + child, child)}
               onChange={changeHandler("child")}
-              reachMaximum={reachMaximum}
             />
           </div>
         </div>
@@ -173,5 +169,5 @@ const SingleRoomAllocation = memo<{
   (prevProps, nextProps) =>
     prevProps.adult === nextProps.adult &&
     prevProps.child === nextProps.child &&
-    prevProps.reachMaximum === nextProps.reachMaximum,
+    prevProps.leftGuest === nextProps.leftGuest,
 );
