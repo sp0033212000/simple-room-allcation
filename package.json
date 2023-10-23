@@ -2,7 +2,7 @@
   "name": "asia-yo",
   "version": "1.0.0",
   "description": "",
-  "homepage": "https://sp0033212000.github.io/simple-room-allcation",
+  "homepage": "https://sp0033212000.github.io/simple-room-allocation",
   "main": "index.js",
   "scripts": {
     "start": "node scripts/start.js",
@@ -15,6 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.23.2",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/preset-env": "^7.23.2",
     "@babel/preset-react": "^7.22.15",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
