@@ -2,10 +2,13 @@
   "name": "asia-yo",
   "version": "1.0.0",
   "description": "",
+  "homepage": "https://sp0033212000.github.io/simple-room-allcation",
   "main": "index.js",
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +37,7 @@
     "eslint-webpack-plugin": "^4.0.1",
     "file-loader": "^6.2.0",
     "fs-extra": "^11.1.1",
+    "gh-pages": "^6.0.0",
     "html-webpack-plugin": "^5.5.3",
     "mini-css-extract-plugin": "^2.7.6",
     "postcss": "^8.4.31",
