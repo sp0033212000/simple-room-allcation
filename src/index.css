@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 100vw;
+  min-height: stretch;
+}
+
+body {
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+/* disable input outline styles */
+input:focus {
+  outline: none;
+}
