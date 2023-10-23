@@ -1,3 +1,3 @@
 # Simple Room Allocation
 
-https://sp0033212000.github.io/simple-room-allocation
+### <a href="https://sp0033212000.github.io/simple-room-allocation" target="_blank">Demo</a>
