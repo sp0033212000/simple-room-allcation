@@ -15,6 +15,7 @@ interface Props {
   disabled?: boolean;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onBlur?: FocusEventHandler<HTMLInputElement>;
+  allowMinus?: boolean;
 }
 
 const CustomInputNumber: React.FC<Props> = ({
@@ -26,6 +27,7 @@ const CustomInputNumber: React.FC<Props> = ({
   disabled = false,
   onChange,
   onBlur,
+  allowMinus = false,
 }) => {
   const rectClass = useRef(
     "flex items-center justify-center mr-2 last:mr-0 px-2 w-12 h-12 font-base border rounded",
@@ -46,21 +48,19 @@ const CustomInputNumber: React.FC<Props> = ({
       const value = event.target.value;
 
       // If value start with minus sign, or end with minus sign, isMinus is true
-      const isMinus = /^-/.test(value) || /-$/.test(value);
+      const isMinus = (/^-/.test(value) || /-$/.test(value)) && value !== "-";
       let parsedValue = Number(value.replace(/[^0-9]/g, ""));
 
-      if (isMinus) {
-        parsedValue = -parsedValue;
+      if (isMinus && allowMinus) {
+        if (parsedValue === 0) {
+          parsedValue = -1;
+        } else {
+          parsedValue = -parsedValue;
+        }
       }
 
       if (parsedValue < min) {
-        if (isMinus) {
-          if (min < 0) {
-            event.target.value = `-1`;
-          }
-        } else {
-          event.target.value = `${min}`;
-        }
+        event.target.value = `${min}`;
       } else if (parsedValue > max) {
         event.target.value = `${max}`;
       } else {
@@ -69,7 +69,7 @@ const CustomInputNumber: React.FC<Props> = ({
 
       onChange?.(event);
     },
-    [min, max],
+    [min, max, allowMinus],
   );
 
   const nativeInputEventValueSetter = useCallback(
@@ -131,7 +131,22 @@ const CustomInputNumber: React.FC<Props> = ({
   }, []);
 
   return (
-    <div className={"flex p-2 w-fit text-white border rounded-md"}>
+    <div
+      className={
+        "relative flex p-2 w-fit text-white border rounded-md overflow-hidden"
+      }
+    >
+      <div
+        className={classNames(
+          "absolute top-0 left-0 z-10",
+          "w-full h-full",
+          "bg-gray-600 bg-opacity-75",
+          "cursor-not-allowed",
+          {
+            "hidden invisible": !disabled,
+          },
+        )}
+      />
       <button
         type={"button"}
         className={classNames(rectClass.current, buttonActiveClass.current)}
@@ -148,6 +163,7 @@ const CustomInputNumber: React.FC<Props> = ({
           onChange={changeHandler}
           value={`${value}`}
           name={name}
+          onBlur={onBlur}
         />
       </div>
       <button
