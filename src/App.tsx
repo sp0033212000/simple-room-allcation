@@ -1,35 +1,19 @@
-import React, {
-  ChangeEventHandler,
-  FocusEventHandler,
-  useCallback,
-  useState,
-} from "react";
-import CustomInputNumber from "./component/common/field/CustomInputNumber";
+import React, { useState } from "react";
+import RoomAllocation, {
+  RoomAllocationResult,
+} from "./component/feature/RoomAllocation";
 
 const App = () => {
-  const [value, setValue] = useState<number>(0);
-
-  const onChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
-    (event) => {
-      setValue(Number(event.target.value));
-    },
-    [],
-  );
-
-  const onBlur = useCallback<FocusEventHandler<HTMLInputElement>>((event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    console.log({ name, value });
-  }, []);
+  const [value, setValue] = useState<Array<RoomAllocationResult>>([]);
 
   return (
-    <div className={"w-full h-screen bg-black"}>
-      <CustomInputNumber
-        name={"test"}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-      />
+    <div className={"flex min-w-full min-h-screen bg-black"}>
+      <div className={"flex-1 max-w-[50vw]"}>
+        <RoomAllocation guest={10} room={3} onChange={setValue} />
+      </div>
+      <div className={"p-6 flex-2 text-white whitespace-pre-wrap"}>
+        {JSON.stringify({ result: value }, null, 4)}
+      </div>
     </div>
   );
 };
