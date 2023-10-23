@@ -1,4 +1,9 @@
-import React, { ChangeEventHandler, useCallback, useState } from "react";
+import React, {
+  ChangeEventHandler,
+  FocusEventHandler,
+  useCallback,
+  useState,
+} from "react";
 import CustomInputNumber from "./component/common/field/CustomInputNumber";
 
 const App = () => {
@@ -11,9 +16,20 @@ const App = () => {
     [],
   );
 
+  const onBlur = useCallback<FocusEventHandler<HTMLInputElement>>((event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    console.log({ name, value });
+  }, []);
+
   return (
     <div className={"w-full h-screen bg-black"}>
-      <CustomInputNumber value={value} onChange={onChange} min={-1234} />
+      <CustomInputNumber
+        name={"test"}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
     </div>
   );
 };

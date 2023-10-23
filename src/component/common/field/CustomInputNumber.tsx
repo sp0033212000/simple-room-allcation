@@ -2,6 +2,7 @@ import React, {
   ChangeEventHandler,
   FocusEventHandler,
   useCallback,
+  useEffect,
   useRef,
 } from "react";
 import classNames from "classnames";
@@ -29,6 +30,8 @@ const CustomInputNumber: React.FC<Props> = ({
   onBlur,
   allowMinus = false,
 }) => {
+  const [mouseStillIn, setMouseStillIn] = React.useState<boolean>(false);
+
   const rectClass = useRef(
     "flex items-center justify-center mr-2 last:mr-0 px-2 w-12 h-12 font-base border rounded",
   );
@@ -39,12 +42,47 @@ const CustomInputNumber: React.FC<Props> = ({
   const mouseDownTimeout = useRef<NodeJS.Timeout | null>(null);
   const mouseDownInterval = useRef<NodeJS.Timeout | null>(null);
 
-  const divClickHandler = useCallback(() => {
+  const inputFocusHandler = useCallback(() => {
     inputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    // Throw error if min > max
+    if (min > max) {
+      throw new Error("min must be less than or equal to max");
+    }
+    // Throw error if step > max - min
+    if (step > max - min) {
+      throw new Error("step must be less than or equal to max - min");
+    }
+    // Throw error if step <= 0
+    if (step <= 0) {
+      throw new Error("step must be greater than 0");
+    }
+    // Throw error if min < 0 and allowMinus is false
+    if (min < 0 && !allowMinus) {
+      throw new Error(
+        "Your min is less than 0, but allowMinus is false, please set allowMinus to true or set min to greater than or equal to 0",
+      );
+    }
+  }, [min, max, step, allowMinus]);
+
+  const blurHandler = useCallback<FocusEventHandler<HTMLInputElement>>(
+    (event) => {
+      // If mouse still in, do nothing
+      // Else, trigger onBlur
+      if (!mouseStillIn) {
+        onBlur?.(event);
+      }
+    },
+    [mouseStillIn, onBlur],
+  );
+
   const changeHandler = useCallback<ChangeEventHandler<HTMLInputElement>>(
     (event) => {
+      // Focus input when value change
+      inputFocusHandler();
+
       const value = event.target.value;
 
       // If value start with minus sign, or end with minus sign, isMinus is true
@@ -69,7 +107,7 @@ const CustomInputNumber: React.FC<Props> = ({
 
       onChange?.(event);
     },
-    [min, max, allowMinus],
+    [min, max, allowMinus, inputFocusHandler],
   );
 
   const nativeInputEventValueSetter = useCallback(
@@ -130,11 +168,22 @@ const CustomInputNumber: React.FC<Props> = ({
     }
   }, []);
 
+  const onMouseLeave = useCallback(() => {
+    setMouseStillIn(false);
+    onMouseUp();
+  }, [onMouseUp]);
+
+  const onMouseEnter = useCallback(() => {
+    setMouseStillIn(true);
+  }, []);
+
   return (
     <div
       className={
         "relative flex p-2 w-fit text-white border rounded-md overflow-hidden"
       }
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <div
         className={classNames(
@@ -153,17 +202,22 @@ const CustomInputNumber: React.FC<Props> = ({
         onClick={riser}
         onMouseDown={onPlusMouseDown}
         onMouseUp={onMouseUp}
+        disabled={disabled}
       >
         +
       </button>
-      <div className={classNames(rectClass.current)} onClick={divClickHandler}>
+      <div
+        className={classNames(rectClass.current)}
+        onClick={inputFocusHandler}
+      >
         <input
           ref={inputRef}
           className={"w-full text-center bg-transparent"}
           onChange={changeHandler}
           value={`${value}`}
           name={name}
-          onBlur={onBlur}
+          onBlur={blurHandler}
+          disabled={disabled}
         />
       </div>
       <button
@@ -172,6 +226,7 @@ const CustomInputNumber: React.FC<Props> = ({
         onClick={dropper}
         onMouseDown={onMinusMouseDown}
         onMouseUp={onMouseUp}
+        disabled={disabled}
       >
         -
       </button>
